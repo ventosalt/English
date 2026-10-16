@@ -10,6 +10,8 @@
   <style>
     /* 独立听力站：仅保留「四级听力精听室」，隐藏其它分区（DOM 保留，避免脚本报错） */
     #subnav, .esec, .stats, #planPanel { display: none !important; }
+    /* 隐藏「本地加载音频」相关界面（题库音频已足够；DOM 保留以兼容脚本） */
+    .lr-player .lr-load-btn, #lrLocalClear, #lrFileName { display: none !important; }
   </style>
 </head>
 <body>
