@@ -1,0 +1,91 @@
+/* ============================================================
+   四级英语听力精听室 —— 移动端适配
+   仅在小屏(<=720px / <=380px)生效，不影响电脑端布局。
+   ============================================================ */
+
+@media (max-width: 720px) {
+  /* 1) 防横向滚动 */
+  html, body { max-width: 100%; overflow-x: hidden; }
+  img, audio, video, table, canvas { max-width: 100%; }
+
+  /* 2) 外壳留白与字号 */
+  .content { padding: 6px 12px 24px; }
+  .topbar { padding: 12px; gap: 8px; }
+  .welcome h2 { font-size: 18px; }
+  .welcome p { font-size: 12.5px; }
+  .mode-switch { font-size: 12px; }
+  .listen-room.panel { padding: 14px 12px; border-radius: 16px; }
+  .panel-head h3 { font-size: 16px; }
+
+  /* 3) 筛选器：纵向铺满，方便点按 */
+  .lr-filters { flex-direction: column; align-items: stretch; gap: 8px; }
+  .lr-filters > label {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; width: 100%; font-size: 13px;
+  }
+  .lr-filters select {
+    flex: 1 1 auto; min-width: 0; max-width: none;
+    min-height: 44px; font-size: 16px;   /* 16px 避免 iOS 聚焦自动放大 */
+  }
+
+  /* 4) 选题下拉 */
+  .lr-picker select { width: 100%; max-width: none; min-height: 46px; font-size: 16px; }
+
+  /* 5) 步骤条：两列按钮化，标签清楚 */
+  .lr-steps { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .lr-steps li {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 42px; padding: 10px 6px; text-align: center; font-size: 13px;
+  }
+
+  /* 6) 播放器：大点击区 */
+  .lr-player { gap: 8px; }
+  .lr-player .lr-btn { flex: 1 1 calc(50% - 8px); min-height: 46px; font-size: 15px; }
+  .lr-player .lr-rate { flex: 1 1 100%; justify-content: space-between; }
+  .lr-player .lr-rate select { min-height: 44px; font-size: 16px; }
+  .lr-player .lr-time { flex: 1 1 100%; text-align: center; font-size: 13.5px; }
+  .lr-player .lr-load-btn { flex: 1 1 auto; min-height: 44px; }
+  #lrLocalClear { min-height: 44px; }
+  .lr-filename { max-width: 100%; white-space: normal; }
+
+  /* 7) 循环 / A-B 区 */
+  .lr-loop { gap: 8px; }
+  .lr-loop-toggle { min-height: 42px; display: inline-flex; align-items: center; gap: 6px; }
+  .lr-loop .mini-btn { min-height: 42px; padding: 8px 12px; font-size: 13px; }
+  .lr-loop .lr-rate { flex: 1 1 100%; justify-content: space-between; }
+  .lr-loop .lr-rate select { min-height: 44px; font-size: 16px; }
+  .lr-loop-sep { display: none; }
+  .lr-ab { width: 100%; text-align: center; }
+
+  /* 8) 字幕导入区 */
+  .lr-subs { gap: 8px; }
+  .lr-subs .lr-load-btn, .lr-subs .mini-btn { min-height: 44px; }
+  .lr-substate { width: 100%; }
+
+  /* 9) 折叠面板与表单控件（防 iOS 放大、便于输入） */
+  .lr-paste summary { min-height: 44px; display: flex; align-items: center; }
+  .lr-paste textarea, #exOut { width: 100%; font-size: 16px; }
+  .field input, .field select, .field textarea { min-height: 44px; font-size: 16px; }
+
+  /* 10) 流程按钮（盲听→…→复盘 由 JS 生成） */
+  #lrActions button { min-height: 46px; flex: 1 1 auto; font-size: 15px; }
+
+  /* 11) 听写计时 */
+  .lr-dictation { gap: 8px; }
+  .lr-dictation .mini-btn { min-height: 42px; }
+
+  /* 12) 原生播放器铺满 */
+  #lrAudio { width: 100%; min-height: 48px; }
+
+  /* 13) 原文 / 题目：手机阅读舒适 */
+  .lr-tr-head { font-size: 14px; }
+  .lr-sentences { font-size: 15px; line-height: 1.9; }
+  .lr-sentences li { padding: 10px 0; }
+  .lr-q-list { font-size: 15px; line-height: 1.8; }
+  .lr-hint { font-size: 13.5px; line-height: 1.7; }
+}
+
+@media (max-width: 380px) {
+  .lr-steps { grid-template-columns: 1fr; }
+  .lr-player .lr-btn { flex: 1 1 100%; }
+}

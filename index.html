@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>四级英语听力精听室</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/english.css">
+  <link rel="stylesheet" href="assets/css/mobile.css">
+  <style>
+    /* 独立听力站：仅保留「四级听力精听室」，隐藏其它分区（DOM 保留，避免脚本报错） */
+    #subnav, .esec, .stats, #planPanel { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-logo">✦</span>
+        <span class="brand-name">四级英语听力精听室</span>
+      </div>
+
+      <div class="nav-label">主菜单</div>
+      <nav class="nav" id="nav">
+        <a class="nav-item active" href="index.html"><span class="nav-icon">🎧</span><span>英语听力精听室</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="theme-toggle" id="themeToggle" type="button">
+          <span id="themeIcon">🌙</span>
+          <span id="themeText">夜间模式</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 主区域 -->
+    <div class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menuBtn" type="button" aria-label="打开菜单">☰</button>
+        <div class="welcome">
+          <h2>四级英语听力精听室</h2>
+          <p>四级听力精听 · 39 套真题音频</p>
+        </div>
+        <div class="topbar-right">
+          <div class="mode-switch" id="modeSwitch">
+            <button type="button" data-mode="CET4" class="active">四级 CET-4</button>
+          </div>
+          <span class="date-pill" id="pageDate"></span>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- 四级听力精听室（置顶） -->
+        <section class="panel listen-room" id="listenRoom">
+          <div class="panel-head">
+            <h3>🎧 四级听力精听室</h3>
+            <span class="panel-tag" id="lrBadge">—</span>
+          </div>
+
+          <!-- 筛选 -->
+          <div class="lr-filters">
+            <label>级别
+              <select id="lrLevel">
+                <option value="all">全部</option>
+                <option value="CET4">四级</option>
+              </select>
+            </label>
+            <label>年份 <select id="lrYear"><option value="all">全部</option></select></label>
+            <label>月份 <select id="lrMonth"><option value="all">全部</option></select></label>
+            <label>套数 <select id="lrSet"><option value="all">全部</option></select></label>
+            <label>题型 <select id="lrType"><option value="all">全部</option></select></label>
+            <label>来源
+              <select id="lrSource">
+                <option value="all">全部</option>
+                <option value="official">正式真题</option>
+                <option value="local">本地音频</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="lr-picker">
+            <select id="lrTrack"></select>
+          </div>
+          <div class="lr-src-note" id="lrSrcNote"></div>
+
+          <!-- 步骤条 -->
+          <ol class="lr-steps" id="lrSteps">
+            <li data-step="1">① 盲听</li>
+            <li data-step="2">② 听写</li>
+            <li data-step="3">③ 第二遍</li>
+            <li data-step="4">④ 对照原文</li>
+            <li data-step="5">⑤ 复盘</li>
+          </ol>
+
+          <!-- 播放器 -->
+          <div class="lr-player">
+            <button type="button" id="lrPlay" class="lr-btn">▶ 播放</button>
+            <button type="button" id="lrReplay" class="lr-btn ghost">↺ 重播</button>
+            <label class="lr-rate">倍速
+              <select id="lrRate">
+                <option value="0.5">0.5×</option>
+                <option value="0.75">0.75×</option>
+                <option value="1" selected>1.0×</option>
+                <option value="1.25">1.25×</option>
+                <option value="1.5">1.5×</option>
+              </select>
+            </label>
+            <span class="lr-time" id="lrTime">00:00 / 00:00</span>
+            <label class="lr-load-btn">本地加载音频
+              <input type="file" id="lrFile" accept="audio/*" hidden>
+            </label>
+            <button type="button" class="mini-btn" id="lrLocalClear" hidden>恢复在线音频</button>
+            <span class="lr-filename" id="lrFileName"></span>
+          </div>
+          <div class="lr-loop">
+            <label class="lr-loop-toggle"><input type="checkbox" id="lrAllLoop"> 整段循环</label>
+            <span class="lr-loop-sep"></span>
+            <label class="lr-loop-toggle"><input type="checkbox" id="lrAbLoop"> A–B 循环</label>
+            <button type="button" class="mini-btn" id="lrSetA">设 A</button>
+            <button type="button" class="mini-btn" id="lrSetB">设 B</button>
+            <button type="button" class="mini-btn" id="lrClearAB">清除</button>
+            <span class="lr-ab" id="lrAbInfo">A — / B —</span>
+            <label class="lr-rate">重复
+              <select id="lrRepeat">
+                <option value="1">1 次</option>
+                <option value="2">2 次</option>
+                <option value="3">3 次</option>
+                <option value="0">无限</option>
+              </select>
+            </label>
+          </div>
+          <div class="lr-subs">
+            <label class="lr-load-btn">导入字幕 (.srt/.vtt/.txt)
+              <input type="file" id="lrSubFile" accept=".srt,.vtt,.txt,text/plain" hidden>
+            </label>
+            <span class="lr-substate" id="lrSubState">未导入（使用内置原文）</span>
+            <button type="button" class="mini-btn" id="lrSubClear">清除导入字幕</button>
+          </div>
+          <details class="lr-paste" id="lrPasteWrap">
+            <summary>粘贴 / 编辑原文（每行一句，可带时间点）</summary>
+            <textarea id="lrPasteText" placeholder="每行一句原文；可选时间点，如 00:01 --> 00:04 Hello world. 或 [00:01] Hello world."></textarea>
+            <div class="lr-paste-actions">
+              <button type="button" class="btn-primary" id="lrPasteSave">保存原文</button>
+              <button type="button" class="btn-ghost" id="lrPasteClear">清空输入</button>
+              <span class="lr-paste-note">保存后即作为当前条目的原文，支持单句循环与同步高亮。</span>
+            </div>
+          </details>
+          <details class="lr-paste" id="lrExportWrap">
+            <summary>保存为题库条目（导出 JSON）</summary>
+            <div class="lr-export-form">
+              <label class="field"><span>级别</span>
+                <select id="exLevel"><option value="CET4">四级 CET4</option></select>
+              </label>
+              <label class="field"><span>年份</span><input type="text" id="exYear" placeholder="2016" maxlength="4"></label>
+              <label class="field"><span>月份</span><input type="text" id="exMonth" placeholder="06" maxlength="2"></label>
+              <label class="field"><span>套数</span><input type="text" id="exSet" placeholder="1" maxlength="3"></label>
+              <label class="field"><span>题型 / 分题</span><input type="text" id="exPart" placeholder="Section A" maxlength="40"></label>
+              <label class="field"><span>题目编号（可选）</span><input type="text" id="exQ" placeholder="如 1-7" maxlength="20"></label>
+              <label class="field full"><span>题目名称</span><input type="text" id="exTitle" placeholder="2016年06月 四级听力 第1套 Section A" maxlength="80"></label>
+              <label class="field full"><span>音频路径（可选，与原文分开保存）</span><input type="text" id="exAudio" placeholder="assets/audio/xxx.mp3" maxlength="200"></label>
+              <label class="field"><span>匹配状态</span>
+                <select id="exMatch">
+                  <option value="unknown">未确认（默认）</option>
+                  <option value="unverified">待核验</option>
+                  <option value="matched">已人工核对一致</option>
+                  <option value="mismatch">不一致</option>
+                </select>
+              </label>
+              <div class="form-actions full">
+                <button type="button" class="btn-primary" id="exSaveBank">保存到本页题库</button>
+                <button type="button" class="btn-ghost" id="exBuild">仅预览 JSON</button>
+                <button type="button" class="btn-ghost" id="exCopy">复制 JSON</button>
+                <button type="button" class="btn-ghost" id="exDownload">下载 .json</button>
+              </div>
+            </div>
+            <textarea id="exOut" readonly placeholder="生成的题库条目（JSON）会显示在这里…"></textarea>
+            <p class="lr-paste-note">用法：把生成的对象粘贴进 assets/js/listening-data.js 的 LISTENING_BANK = [ ... ] 中（放在 [ 之后）。不会修改或删除任何现有条目。</p>
+            <div class="lr-tr-head" style="margin-top:14px">本页题库（刷新后保留）</div>
+            <ul class="lr-export-list" id="exList"></ul>
+          </details>
+          <div class="lr-noaudio" id="lrNoAudio" hidden></div>
+          <audio id="lrAudio" preload="metadata" controls></audio>
+
+          <!-- 提示 + 计时 -->
+          <p class="lr-hint" id="lrHint">第一遍：盲听，不看原文也不看答案。</p>
+          <div class="lr-dictation" id="lrDictation" hidden>
+            <span>听写计时</span>
+            <strong id="lrTimer">00:00</strong>
+            <button type="button" id="lrTimerStart" class="mini-btn">开始</button>
+            <button type="button" id="lrTimerPause" class="mini-btn">暂停</button>
+            <button type="button" id="lrTimerReset" class="mini-btn">重置</button>
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="lr-actions" id="lrActions"></div>
+
+          <!-- 原文（默认隐藏） -->
+          <div class="lr-transcript" id="lrTranscript" hidden>
+            <div class="lr-tr-head">听力原文（逐句对照）</div>
+            <ol class="lr-sentences" id="lrSentences"></ol>
+          </div>
+
+          <!-- 题目（按题号） -->
+          <div class="lr-questions" id="lrQuestions" hidden>
+            <div class="lr-tr-head">题目（按题号）</div>
+            <ol class="lr-q-list" id="lrQuestionList"></ol>
+          </div>
+
+          <!-- 复盘 -->
+          <div class="lr-review" id="lrReview" hidden>
+            <div class="lr-tr-head">本次复盘</div>
+            <div class="grid-form">
+              <label class="field"><span>生词</span><input type="text" id="rvWords" placeholder="记下没听出的生词…"></label>
+              <label class="field"><span>漏听内容</span><input type="text" id="rvMissed" placeholder="漏掉的句子 / 信息…"></label>
+              <label class="field"><span>连读 / 弱读</span><input type="text" id="rvLinking" placeholder="没听清的连读弱读…"></label>
+              <label class="field"><span>不理解的句子</span><input type="text" id="rvUnclear" placeholder="没听懂的句子…"></label>
+              <label class="field full lr-check"><span>完成情况</span>
+                <span class="lr-done"><input type="checkbox" id="rvDone"> 本次精听已完成</span>
+              </label>
+              <div class="form-actions full">
+                <button type="button" class="btn-primary" id="rvSave">保存复盘</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 记录与复习 -->
+          <div class="lr-logs">
+            <div class="lr-tr-head">精听记录</div>
+            <ul class="lr-log-list" id="lrLogList"></ul>
+            <div class="lr-tr-head" style="margin-top:14px">听力复习清单</div>
+            <ul class="lr-review-list" id="lrReviewList"></ul>
+          </div>
+        </section>
+
+        <!-- 统计卡片 -->
+        <section class="stats">
+          <div class="stat-card">
+            <span class="stat-icon green">📖</span>
+            <div><div class="stat-value" id="statWords">0</div><div class="stat-label">词汇 / 短语</div></div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon blue">🔁</span>
+            <div><div class="stat-value" id="statReview">0</div><div class="stat-label">待复习</div></div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon pink">📝</span>
+            <div><div class="stat-value" id="statMistakes">0</div><div class="stat-label">错题记录</div></div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon teal">✅</span>
+            <div><div class="stat-value" id="statProgress">0%</div><div class="stat-label">今日完成度</div></div>
+          </div>
+        </section>
+
+        <!-- 每日计划 -->
+        <section class="panel" id="planPanel">
+          <div class="panel-head">
+            <h3>每日学习计划</h3>
+            <span class="panel-tag" id="planTotal">约 20 分钟</span>
+          </div>
+          <p class="muted-note">时长可自由调整；完成一项即勾选。计划每日自动重置。</p>
+          <div class="plan-list" id="planList"></div>
+          <div class="plan-progress">
+            <div class="pp-bar"><i id="planBar"></i></div>
+            <span class="pp-text" id="planText">0 / 0</span>
+          </div>
+        </section>
+
+        <!-- 子导航 -->
+        <nav class="subnav" id="subnav">
+          <button type="button" data-sec="vocab" class="active">1 · 词汇短语</button>
+          <button type="button" data-sec="reading">3 · 阅读</button>
+          <button type="button" data-sec="translation">4 · 翻译</button>
+          <button type="button" data-sec="writing">5 · 写作</button>
+          <button type="button" data-sec="mistakes">6 · 真题与错题</button>
+          <button type="button" data-sec="speaking">口语（辅助）</button>
+        </nav>
+
+        <!-- 1 词汇短语 -->
+        <section class="esec" data-sec="vocab">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>核心词汇与短语</h3>
+              <span class="panel-tag" id="vocabCount">0 条</span>
+            </div>
+            <p class="muted-note">示例词条为原创整理，<strong>非官方词表</strong>；请以权威词书为准。</p>
+            <form class="grid-form" id="wordForm" autocomplete="off">
+              <label class="field">
+                <span>类型</span>
+                <select id="wType">
+                  <option value="word">单词</option>
+                  <option value="phrase">短语</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>级别</span>
+                <select id="wLevel">
+                  <option value="CET4">四级</option>
+                </select>
+              </label>
+              <label class="field full">
+                <span>英文</span>
+                <input type="text" id="wTerm" placeholder="例如：abandon / account for" maxlength="60" required>
+              </label>
+              <label class="field">
+                <span>音标（选填）</span>
+                <input type="text" id="wPhonetic" placeholder="/əˈbændən/" maxlength="40">
+              </label>
+              <label class="field">
+                <span>中文释义</span>
+                <input type="text" id="wMeaning" placeholder="放弃；抛弃" maxlength="80">
+              </label>
+              <label class="field full">
+                <span>例句（选填）</span>
+                <input type="text" id="wExample" placeholder="He abandoned the plan." maxlength="120">
+              </label>
+              <div class="form-actions full">
+                <button type="submit" class="btn-primary">添加</button>
+              </div>
+            </form>
+
+            <div class="filter-tabs" id="vocabFilter">
+              <button type="button" data-f="all" class="active">全部</button>
+              <button type="button" data-f="word">单词</button>
+              <button type="button" data-f="phrase">短语</button>
+              <button type="button" data-f="CET4">四级</button>
+            </div>
+            <ul class="vocab-list" id="vocabList"></ul>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>词汇复习清单</h3>
+              <span class="panel-tag" id="reviewCount">0 项</span>
+            </div>
+            <p class="muted-note">加入后第 1 / 3 / 7 天进入复习；点“已复习”即可顺延。</p>
+            <ul class="review-list" id="reviewList"></ul>
+          </div>
+        </section>
+
+        <!-- 3 阅读 -->
+        <section class="esec" data-sec="reading" hidden>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>阅读理解</h3>
+              <span class="panel-tag">原创练习</span>
+            </div>
+            <div class="notice">以下短文与题目为<strong>原创练习示例</strong>（非真题），覆盖选词填空 / 长篇匹配 / 仔细阅读三类题型思路。</div>
+            <div id="readingList" class="practice-list"></div>
+          </div>
+        </section>
+
+        <!-- 4 翻译 -->
+        <section class="esec" data-sec="translation" hidden>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>翻译专项（汉译英）</h3>
+              <span class="panel-tag" id="transCount">0 篇</span>
+            </div>
+            <div class="notice">以下中文句子为<strong>原创练习</strong>（主题：中国文化 / 社会 / 历史 / 日常），非真题。写下你的译文后可查看参考与表达建议。</div>
+            <div id="translationList" class="practice-list"></div>
+          </div>
+        </section>
+
+        <!-- 5 写作 -->
+        <section class="esec" data-sec="writing" hidden>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>写作专项</h3>
+              <span class="panel-tag" id="writeCount">0 篇</span>
+            </div>
+            <div class="notice">以下题型与提纲为<strong>原创练习</strong>，非真题。写完可对照“结构提示 / 万能句型 / 自评清单”。</div>
+            <div id="writingList" class="practice-list"></div>
+          </div>
+        </section>
+
+        <!-- 6 真题与错题 -->
+        <section class="esec" data-sec="mistakes" hidden>
+          <div class="panel">
+            <div class="notice strong">
+              ⚠️ 本页<strong>不提供任何官方真题内容</strong>。请使用正版真题备考；此处仅用于<strong>记录你的练习成绩与错题复盘</strong>，便于追踪各专项进步。
+            </div>
+            <div class="panel-head">
+              <h3>真题模拟记录 & 错题本</h3>
+              <span class="panel-tag" id="mistakeCount">0 条</span>
+            </div>
+            <form class="grid-form" id="mistakeForm" autocomplete="off">
+              <label class="field">
+                <span>日期</span>
+                <input type="date" id="mDate">
+              </label>
+              <label class="field">
+                <span>级别</span>
+                <select id="mLevel"><option value="CET4">四级</option></select>
+              </label>
+              <label class="field">
+                <span>专项</span>
+                <select id="mPart">
+                  <option>听力</option><option>阅读</option><option>翻译</option><option>写作</option><option>词汇</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>得分 / 正确率</span>
+                <input type="text" id="mScore" placeholder="例如：8/10 或 80%" maxlength="30">
+              </label>
+              <label class="field full">
+                <span>错题 / 问题描述</span>
+                <input type="text" id="mQuestion" placeholder="例如：长篇匹配 T3 定位错误" maxlength="120">
+              </label>
+              <label class="field full">
+                <span>错误原因</span>
+                <input type="text" id="mReason" placeholder="例如：没抓住同义替换" maxlength="120">
+              </label>
+              <label class="field full">
+                <span>正确思路</span>
+                <input type="text" id="mFix" placeholder="例如：先看题干关键词回原文定位" maxlength="120">
+              </label>
+              <label class="field">
+                <span>复习日期</span>
+                <input type="date" id="mReview">
+              </label>
+              <div class="form-actions full">
+                <button type="submit" class="btn-primary">保存记录</button>
+              </div>
+            </form>
+            <ul class="mistake-list" id="mistakeList"></ul>
+          </div>
+        </section>
+
+        <!-- 口语（辅助） -->
+        <section class="esec" data-sec="speaking" hidden>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>口语练习（辅助）</h3>
+              <span class="panel-tag">辅助</span>
+            </div>
+            <div class="notice">口语为<strong>辅助</strong>功能，服务于整体英语表达；备考核心仍在词汇、听力、阅读、翻译与写作。</div>
+            <div id="speakingList" class="practice-list"></div>
+          </div>
+        </section>
+
+        <footer class="page-footer">
+          <p>英语听力数据保存在浏览器本地（localStorage）· 音频为本地真题资源</p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="assets/js/listening-data.js"></script>
+  <script src="assets/js/listening-local.js"></script>
+  <script src="assets/js/english.js"></script>
+</body>
+</html>
